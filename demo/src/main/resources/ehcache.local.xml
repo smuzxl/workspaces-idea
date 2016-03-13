@@ -1,0 +1,16 @@
+<ehcache name="cacheGroup" updateCheck="false">
+    <diskStore path="java.io.tmpdir"/>
+    <!--<terracottaConfig url="192.168.6.129:9510"/>-->
+    <defaultCache timeToIdleSeconds="3600" timeToLiveSeconds="3600" maxBytesLocalHeap="50M" eternal="false"
+                  overflowToDisk="false">
+        <!--<terracotta/>-->
+    </defaultCache>
+    <cache name="tenMin" timeToIdleSeconds="3600" maxElementsOnDisk="300000" maxBytesLocalHeap="50M" eternal="false"
+           overflowToDisk="false">
+        <!--<terracotta/>-->
+    </cache>
+    <cache name="demo" timeToIdleSeconds="3600" maxElementsOnDisk="300000" maxBytesLocalHeap="50M" eternal="false"
+           overflowToDisk="false">
+        <!--<terracotta/>-->
+    </cache>
+</ehcache>

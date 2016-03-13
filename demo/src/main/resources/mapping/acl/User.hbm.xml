@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.zxl.model.User" table="APP_USER" lazy="false">
+        <cache usage="nonstrict-read-write" region="demo"/>
+        <id name="id" column="id" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="username" column="USERNAME"/>
+        <property name="password" column="PASSWORD"/>
+        <property name="nickname" column="DISPLAYNAME"/>
+        <property name="email" column="email"/>
+    </class>
+</hibernate-mapping>
+

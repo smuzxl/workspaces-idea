@@ -1,0 +1,6 @@
+<h2>welcome to main page</h2>
+
+
+<a href="${basePath}login.xhtml">To Login Page</a>
+<a href="${basePath}logout.xhtml">To Logout Page</a>
+<a href="${basePath}admin/index.xhtml">To index Page</a>

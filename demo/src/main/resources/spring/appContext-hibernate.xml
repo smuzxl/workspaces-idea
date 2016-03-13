@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <bean id="regionFactory" class="net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory">
+        <constructor-arg>
+            <props/>
+        </constructor-arg>
+    </bean>
+    <!-- <bean id="cacheObjectService" depends-on="daoService" class="com.gewara.untrans.impl.CacheObjectServiceImpl"> -->
+    <!-- <property name="daoService" ref="daoService" /> -->
+    <!-- </bean> -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="cacheRegionFactory" ref="regionFactory"/>
+        <property name="mappingDirectoryLocations">
+            <list>
+                <value>classpath:mapping</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.default_schema">demo</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.generate_statistics">true</prop>
+                <prop key="net.sf.ehcache.configurationResourceName">/ehcache.local.xml</prop>
+            </props>
+        </property>
+        <!-- <property name="eventListeners"> -->
+        <!-- <map> -->
+        <!-- <entry key="load"> -->
+        <!-- <bean class="com.zxl.support.CustomLoadEventListener" /> -->
+        <!-- </entry> -->
+        <!-- </map> -->
+        <!-- </property> -->
+    </bean>
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+    <bean id="baseDao" class="com.zxl.repository.impl.BaseDaoImpl"/>
+    <bean id="daoService" depends-on="baseDao" class="com.zxl.service.impl.DaoServiceImpl"/>
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="rollbackOnCommitFailure" value="true"/>
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+</beans>

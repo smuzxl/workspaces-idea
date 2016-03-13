@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sec="http://www.springframework.org/schema/security"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+			http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    <bean id="securityFilter" class="org.springframework.security.web.FilterChainProxy">
+        <constructor-arg>
+            <sec:filter-chain request-matcher-ref="filterMatcher"
+                              filters="securityContextPersistenceFilter,logoutFilter,authenticationFilter,securityContextHolderAwareRequestFilter,exceptionTranslationFilter,filterSecurityInterceptor"/>
+        </constructor-arg>
+    </bean>
+    <bean id="filterMatcher" class="com.zxl.support.PrefixUriRequestMatcher">
+        <property name="prefixUris" value="/"/>
+    </bean>
+    <bean id="securityContextRepository" class="com.zxl.support.WebSecurityContextRepository"/>
+    <bean id="securityContextPersistenceFilter"
+          class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+        <property name="securityContextRepository" ref="securityContextRepository"/>
+    </bean>
+    <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter">
+        <constructor-arg ref="logoutHandler"/>
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler"/>
+            </list>
+        </constructor-arg>
+        <property name="filterProcessesUrl" value="/logout.xhtml"/>
+    </bean>
+    <bean id="logoutHandler" class="com.zxl.support.WebUrlLogoutSuccessHandler">
+        <property name="defaultTargetUrl" value="/login.xhtml"/>
+    </bean>
+    <bean id="authenticationFilter"
+          class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="authenticationSuccessHandler" ref="successHandler"/>
+        <property name="authenticationFailureHandler" ref="failureHandler"/>
+        <property name="filterProcessesUrl" value="/doLogin.xhtml"/>
+    </bean>
+    <bean id="successHandler" class="com.zxl.support.WebAuthenticationSuccessHandler">
+        <property name="defaultTargetUrl" value="/admin/main.xhtml"/>
+        <property name="targetUrlParameter" value="TARGETURL"/>
+    </bean>
+    <bean id="failureHandler" class="com.zxl.support.WebAuthenticationFailureHandler">
+        <property name="defaultFailureUrl" value="/login.xhtml"/>
+    </bean>
+    <bean id="securityContextHolderAwareRequestFilter"
+          class="org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter"/>
+    <bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <constructor-arg>
+            <bean class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+                <constructor-arg value="/login.xhtml"/>
+                <property name="forceHttps" value="false"/>
+            </bean>
+        </constructor-arg>
+        <property name="accessDeniedHandler">
+            <bean class="org.springframework.security.web.access.AccessDeniedHandlerImpl">
+                <property name="errorPage" value="/error/403.html"></property>
+            </bean>
+        </property>
+        <property name="requestCache">
+            <bean class="org.springframework.security.web.savedrequest.NullRequestCache"/>
+        </property>
+    </bean>
+    <bean id="securityMetadataSource" class="com.zxl.support.WebSecurityMetadataSource">
+        <property name="aclService" ref="aclService"/>
+    </bean>
+    <bean id="filterSecurityInterceptor"
+          class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="accessDecisionManager"/>
+        <property name="securityMetadataSource" ref="securityMetadataSource"/>
+    </bean>
+    <!-- RoleVoter默认角色名称都要以ROLE_开头，否则不会被计入权限控制，如果要修改前缀，可以通过对rolePrefix属性进行修改 -->
+    <bean id="roleVoter" class="org.springframework.security.access.vote.RoleVoter"/>
+    <bean id="accessDecisionManager" class="org.springframework.security.access.vote.AffirmativeBased">
+        <!-- 是否允许所有的投票者弃权,如果为false，表示如果所有的投票者弃权，就禁止访问 -->
+        <property name="allowIfAllAbstainDecisions" value="false"/>
+        <property name="decisionVoters">
+            <list>
+                <ref bean="roleVoter"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="authenticationManager" class="org.springframework.security.authentication.ProviderManager">
+        <property name="providers">
+            <list>
+                <ref bean="daoAuthenticationProvider"/>
+            </list>
+        </property>
+        <property name="authenticationEventPublisher" ref="authenticationEventPublisher"/>
+    </bean>
+    <bean id="daoAuthenticationProvider"
+          class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <property name="userDetailsService" ref="aclService"/>
+        <property name="passwordEncoder" ref="passwordEncoder"/>
+    </bean>
+    <bean id="authenticationEventPublisher" class="com.zxl.support.WebAuthenticationEventPublisher"/>
+    <bean id="passwordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+</beans>

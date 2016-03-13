@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
+     <bean id="memcachedClient" class="net.spy.memcached.spring.MemcachedClientFactoryBean">
+     <property name="servers" value="192.168.6.129:12000" />
+     </bean>
+     <!--<bean id="memcachedClient4Page" class="net.spy.memcached.spring.MemcachedClientFactoryBean">
+     <property name="servers" value="${memcached.servers.page}" />
+     </bean> -->
+    <bean id="configService" class="com.zxl.untrans.impl.CacheConfigureImpl">
+    </bean>
+    <bean id="cacheService" class="com.zxl.untrans.impl.EhcacheCacheServiceImpl">
+        <property name="regionFactory" ref="regionFactory"/>
+        <property name="cacheConfigure" ref="configService"/>
+        <property name="regionTimeMap">
+            <map>
+                <entry key="halfMin" value="30"/>
+                <entry key="oneMin" value="60"/>
+                <entry key="tenMin" value="600"/>
+                <entry key="twentyMin" value="1200"/>
+                <entry key="halfHour" value="1800"/>
+                <entry key="oneHour" value="3600"/>
+                <entry key="twoHour" value="7200"/>
+                <entry key="halfDay" value="43200"/>
+                <entry key="oneDay" value="86400"/>
+                <entry key="openSeat" value="43200"/>
+            </map>
+        </property>
+    </bean>
+</beans>
